@@ -1,0 +1,17 @@
+role: store
+store:
+  id: 2
+  mode: distributed
+  host: 127.0.0.1
+  raft_port: 7102
+  client_port: 8102
+  data_dir: ./data/store2
+cluster:
+  store_count: 3
+pd:
+  endpoints: 127.0.0.1:7000
+raft:
+  heartbeat_interval_ms: 50
+  election_timeout_min_ms: 150
+  election_timeout_max_ms: 300
+  snapshot_threshold: 100000

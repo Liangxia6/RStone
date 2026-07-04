@@ -1,0 +1,11 @@
+role: gateway
+gateway:
+  id: gateway1
+  host: 127.0.0.1
+  http_port: 8081
+  route_cache_ttl_ms: 30000
+  store_routing: dynamic
+pd:
+  endpoints: 127.0.0.1:7000
+store:
+  endpoint: 127.0.0.1:8101

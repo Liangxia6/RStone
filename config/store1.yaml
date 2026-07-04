@@ -1,0 +1,13 @@
+role: store
+store:
+  host: 127.0.0.1
+  raft_port: 7101
+  client_port: 8101
+  data_dir: ./data/store1
+pd:
+  endpoints: 127.0.0.1:7000
+raft:
+  heartbeat_interval_ms: 50
+  election_timeout_min_ms: 150
+  election_timeout_max_ms: 300
+  snapshot_threshold: 100000

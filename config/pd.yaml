@@ -1,0 +1,6 @@
+role: pd
+pd:
+  id: pd1
+  host: 127.0.0.1
+  client_port: 7000
+  data_dir: ./data/pd1
