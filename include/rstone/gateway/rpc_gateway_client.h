@@ -33,9 +33,11 @@ class RpcGatewayClient {
   const RouteCache& route_cache() const { return route_cache_; }
 
  private:
+  // 查询或刷新 Region 路由；Gateway 只缓存元数据，不保存用户数据。
   Status ResolveRoute(const std::string& key, RouteEntry* route);
   RpcResponse CallPd(const std::string& method, const FieldMap& fields);
   RpcResponse CallStore(const std::string& method, const FieldMap& fields);
+  // KV 请求可以按 PD 返回的 leader endpoint 动态选择 Store。
   RpcResponse CallStoreWithRouteRetry(const std::string& method, const std::string& key,
                                       FieldMap fields);
   bool IsRouteStaleError(const RpcResponse& response) const;

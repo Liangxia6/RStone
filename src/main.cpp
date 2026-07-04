@@ -181,6 +181,7 @@ bool DecodePdStatus(const rstone::RpcResponse& response, rstone::FieldMap* field
 }
 
 int RunDistributedStoreService(const rstone::Config& config) {
+  // 分布式模式：每个 Store 进程只注册自己，不再在一个进程里模拟三个 Store。
   const auto pd_endpoint = ParseEndpoint(config.GetStringOr("pd.endpoints", "127.0.0.1:7000"),
                                          7000);
   rstone::TcpRpcClient pd_client(pd_endpoint.host, pd_endpoint.port);
@@ -196,6 +197,7 @@ int RunDistributedStoreService(const rstone::Config& config) {
   rstone::PutStoreFields(&fields, local_store);
   rstone::RpcResponse response;
   for (int attempt = 0; attempt < 100; ++attempt) {
+    // PD 刚监听时 TCP 连接可能还没完全稳定，注册 Store 做短重试。
     response = CallRpc(&pd_client, "pd.RegisterStore", fields,
                        "store-register-" + std::to_string(local_store.store_id) + "-" +
                            std::to_string(attempt));
@@ -224,6 +226,7 @@ int RunDistributedStoreService(const rstone::Config& config) {
   std::vector<rstone::StoreInfo> stores;
   std::vector<rstone::RegionInfo> regions;
   for (int attempt = 0; attempt < 200; ++attempt) {
+    // 等待所有 Store 注册完成后再 bootstrap Region，否则会形成不完整副本集。
     rstone::FieldMap empty;
     response = CallRpc(&pd_client, "pd.Status", empty, "store-pd-status-" + std::to_string(attempt));
     rstone::FieldMap status_fields;
@@ -260,6 +263,7 @@ int RunDistributedStoreService(const rstone::Config& config) {
   }
 
   auto node = std::make_unique<rstone::DistributedRegionNode>();
+  // 使用 PD 中的 Region/Peer 元数据启动本地 Peer，并从本地数据目录恢复 Raft 状态。
   status = node->Bootstrap(config.GetStringOr("store.data_dir", "./data/store1"),
                            local_store, stores, regions.front());
   if (!status.ok()) {

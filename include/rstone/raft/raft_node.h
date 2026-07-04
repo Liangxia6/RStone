@@ -78,12 +78,17 @@ class RaftNode {
   void BecomeCandidate();
   void BecomeLeader();
 
+  // 处理候选人的投票请求；这里只判断任期、是否已投票以及候选日志是否足够新。
   RequestVoteResponse HandleRequestVote(const RequestVoteRequest& request);
+  // 处理 Leader 的日志复制/心跳请求；日志匹配后才追加并推进 commit index。
   AppendEntriesResponse HandleAppendEntries(const AppendEntriesRequest& request);
 
+  // Leader 接收到写请求后先生成本地日志，真正提交要等上层复制到多数派。
   Status Propose(EntryType type, const std::string& command, LogEntry* entry);
   void SetCommitIndex(LogIndex commit_index);
+  // 取出已经提交但尚未应用到状态机的日志，上层负责把 command 应用到 KV Engine。
   std::vector<LogEntry> TakeCommittedEntries();
+  // 节点重启后从 RaftStorage 恢复任期、投票、commit/apply 位置和日志。
   Status Restore(Term current_term, std::optional<PeerId> voted_for,
                  LogIndex commit_index, LogIndex last_applied,
                  std::vector<LogEntry> log);

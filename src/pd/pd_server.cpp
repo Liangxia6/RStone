@@ -26,6 +26,7 @@ Status PdServer::RegisterStore(StoreInfo* store) {
   if (store->store_id == 0) {
     store->store_id = metadata_.AllocStoreId();
   } else if (store->store_id >= metadata_.next_store_id()) {
+    // 配置指定固定 store_id 时，也要推进 next_store_id，避免后续自动分配冲突。
     metadata_.SetNextIds(store->store_id + 1, metadata_.next_region_id(),
                          metadata_.next_peer_id());
   }
@@ -59,6 +60,7 @@ Status PdServer::BootstrapDefaultRegion(const std::vector<StoreId>& store_ids) {
   }
 
   RegionInfo region;
+  // 默认 Region 使用空 start/end 表示覆盖全部 key range。
   region.region_id = metadata_.AllocRegionId();
   region.start_key = "";
   region.end_key = "";
@@ -67,6 +69,7 @@ Status PdServer::BootstrapDefaultRegion(const std::vector<StoreId>& store_ids) {
       return {ErrorCode::kStoreNotFound, "store not found for default region"};
     }
     Peer peer;
+    // 每个 Store 获得一个 Peer，多个 Peer 组成该 Region 的 Raft Group。
     peer.peer_id = metadata_.AllocPeerId();
     peer.store_id = store_id;
     peer.role = PeerRole::kVoter;
@@ -94,6 +97,7 @@ Status PdServer::SplitRegion(RegionId region_id, const std::string& split_key,
   RegionInfo left_region = *region;
   RegionInfo right_region = *region;
 
+  // 左 Region 复用原 region_id，右 Region 分配新 region_id。
   left_region.end_key = split_key;
   left_region.epoch.version += 1;
 
@@ -217,6 +221,7 @@ std::optional<StoreInfo> PdServer::GetStore(StoreId store_id) const {
 }
 
 std::optional<StoreInfo> PdServer::GetRegionLeaderStore(const RegionInfo& region) const {
+  // Region 记录的是 leader_peer_id，需要先找到 Peer，再映射到 Store。
   const Peer* leader = FindPeer(region, region.leader_peer_id);
   if (leader == nullptr) {
     return std::nullopt;

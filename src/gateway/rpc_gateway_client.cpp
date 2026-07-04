@@ -33,6 +33,7 @@ RpcGatewayClient::RpcGatewayClient(std::shared_ptr<RpcClient> pd_client,
 
 Status RpcGatewayClient::Put(const std::string& key, const std::string& value) {
   RouteEntry route;
+  // 先拿到 Region 路由，后续请求携带 region_id 让 Store 可以发现 stale route。
   auto status = ResolveRoute(key, &route);
   if (!status.ok()) {
     return status;
@@ -141,6 +142,7 @@ Status RpcGatewayClient::TransferLeader(RegionId region_id, PeerId target_peer_i
 
   RpcResponse store_response;
   if (dynamic_store_routing_) {
+    // 动态路由模式下，转主 RPC 必须发送给目标 Peer 所在 Store。
     FieldMap empty;
     auto status_response = CallPd("pd.Status", empty);
     if (!status_response.ok) {
@@ -299,6 +301,7 @@ Status RpcGatewayClient::ResolveRoute(const std::string& key, RouteEntry* route)
     return Status::Ok();
   }
 
+  // 缓存未命中时向 PD 查询，PD 会返回 Region 和当前 Leader Store。
   FieldMap fields;
   fields["key"] = key;
   const auto response = CallPd("pd.GetRegionByKey", fields);
@@ -352,6 +355,7 @@ RpcResponse RpcGatewayClient::CallStoreWithRouteRetry(const std::string& method,
     if (!dynamic_store_routing_) {
       return CallStore(method, request_fields);
     }
+    // 服务模式下按路由动态连接 Store；测试路径仍可使用注入的固定 RpcClient。
     RouteEntry route;
     auto status = ResolveRoute(key, &route);
     if (!status.ok()) {
@@ -376,6 +380,7 @@ RpcResponse RpcGatewayClient::CallStoreWithRouteRetry(const std::string& method,
     return response;
   }
 
+  // Region split 或 leader 改变时，旧缓存会触发 stale/not leader，清空后重查 PD。
   route_cache_.Clear();
   RouteEntry refreshed;
   auto status = ResolveRoute(key, &refreshed);

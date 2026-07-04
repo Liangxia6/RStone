@@ -34,6 +34,7 @@ Status ApplyKvCommand(KvEngine* engine, const std::string& command) {
   std::string op;
   input >> op;
   if (op == "PUT") {
+    // Raft 层只复制 command 字符串，真正修改状态机发生在 apply 阶段。
     std::string key_hex;
     std::string value_hex;
     input >> key_hex >> value_hex;

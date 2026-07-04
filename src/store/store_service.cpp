@@ -127,6 +127,7 @@ RpcResponse StoreService::HandlePut(const RpcRequest& request) {
   if (!status.ok()) {
     return StatusToRpcError(request, status);
   }
+  // 分布式路径：当前 Store 进程只处理自己的本地 Peer，并通过 RPC 复制到其他 Store。
   if (distributed_node_ != nullptr) {
     status = distributed_node_->Put(fields["key"], fields["value"]);
   } else if (multi_cluster_ != nullptr) {

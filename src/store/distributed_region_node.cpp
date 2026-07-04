@@ -49,6 +49,7 @@ Status DistributedRegionNode::Bootstrap(const std::string& data_dir,
                                         const StoreInfo& local_store,
                                         const std::vector<StoreInfo>& stores,
                                         const RegionInfo& region) {
+  // 启动时 PD 已经给出 Region/Peer 元数据，本节点只加载自己所在 Store 的 Peer。
   local_store_ = local_store;
   stores_ = stores;
   region_ = region;
@@ -72,6 +73,7 @@ Status DistributedRegionNode::Bootstrap(const std::string& data_dir,
   }
   raft_storage_ = std::make_unique<RaftStorage>(&engine_);
 
+  // 有持久化 hard state 时恢复 Raft 运行状态；没有则作为新 Peer 启动。
   HardState hard_state;
   status = raft_storage_->LoadHardState(region_.region_id, &hard_state);
   if (status.ok()) {
@@ -118,6 +120,7 @@ Status DistributedRegionNode::TransferLeader(PeerId target_peer_id) {
   if (target_peer_id != local_peer_.peer_id) {
     return {ErrorCode::kNotLeader, "transfer request must be sent to target peer"};
   }
+  // PD 已经把 leader hint 改到目标 peer，这里同步本地 hint 并发起选举。
   region_.leader_peer_id = target_peer_id;
   return EnsureLeader();
 }
@@ -159,6 +162,7 @@ Status DistributedRegionNode::EnsureLeader() {
   if (raft_->role() == RaftRole::kLeader) {
     return Status::Ok();
   }
+  // 只有 PD 认为的目标 Leader 才会主动发起选举，避免多个 Store 同时抢主。
   if (local_peer_.peer_id != region_.leader_peer_id) {
     return {ErrorCode::kNotLeader, "request must be sent to region leader"};
   }
@@ -220,6 +224,7 @@ Status DistributedRegionNode::ProposeAndReplicate(const std::string& command) {
   }
 
   LogEntry entry;
+  // 写请求先进入 Raft 日志；此时还没有提交，也还不能应用到 KV 状态机。
   status = raft_->Propose(EntryType::kNormal, command, &entry);
   if (!status.ok()) {
     return status;
@@ -252,6 +257,7 @@ Status DistributedRegionNode::ProposeAndReplicate(const std::string& command) {
     return Status::Internal("failed to replicate entry to majority");
   }
 
+  // 多数派复制成功后才能推进 commit index，并把日志应用到本地 KV Engine。
   raft_->SetCommitIndex(entry.index);
   status = ApplyCommitted();
   if (!status.ok()) {
@@ -265,6 +271,7 @@ Status DistributedRegionNode::ProposeAndReplicate(const std::string& command) {
 }
 
 Status DistributedRegionNode::BroadcastCommit(LogIndex commit_index) {
+  // 提交成功后再广播一次 commit index，让 follower 应用已经复制的日志。
   for (const auto& peer : region_.peers) {
     if (peer.peer_id == local_peer_.peer_id) {
       continue;
@@ -325,6 +332,7 @@ Status DistributedRegionNode::ReplicateToStore(const StoreInfo& store, LogIndex 
       *replicated = true;
       return Status::Ok();
     }
+    // follower 缺日志或日志冲突时，按它返回的末尾位置回退并重发后缀。
     if (append_response.match_index == 0) {
       next_index = 1;
     } else {

@@ -43,6 +43,7 @@ void RaftNode::BecomeLeader() {
 RequestVoteResponse RaftNode::HandleRequestVote(const RequestVoteRequest& request) {
   RequestVoteResponse response;
 
+  // 旧任期的候选人不能获得投票；Raft 通过 term 单调递增避免旧 Leader 继续写入。
   if (request.term < current_term_) {
     response.term = current_term_;
     response.vote_granted = false;
@@ -53,6 +54,7 @@ RequestVoteResponse RaftNode::HandleRequestVote(const RequestVoteRequest& reques
     BecomeFollower(request.term);
   }
 
+  // 一个任期内最多投一票，同时候选人的日志不能比本节点旧。
   const bool can_vote = !voted_for_.has_value() || *voted_for_ == request.candidate_id;
   const bool up_to_date =
       IsCandidateLogUpToDate(request.last_log_index, request.last_log_term);
@@ -69,6 +71,7 @@ RequestVoteResponse RaftNode::HandleRequestVote(const RequestVoteRequest& reques
 AppendEntriesResponse RaftNode::HandleAppendEntries(const AppendEntriesRequest& request) {
   AppendEntriesResponse response;
 
+  // Leader 任期落后时直接拒绝，调用方会据此停止旧 Leader 行为。
   if (request.term < current_term_) {
     response.term = current_term_;
     response.success = false;
@@ -96,6 +99,7 @@ AppendEntriesResponse RaftNode::HandleAppendEntries(const AppendEntriesRequest& 
     if (entry.index <= last_log_index()) {
       const auto existing = log_[entry.index - 1];
       if (existing.term != entry.term) {
+        // 同一 index 任期不同，说明出现日志冲突；删除冲突点及其之后的日志。
         DeleteFrom(entry.index);
         log_.push_back(entry);
       }
@@ -136,6 +140,7 @@ void RaftNode::SetCommitIndex(LogIndex commit_index) {
 
 std::vector<LogEntry> RaftNode::TakeCommittedEntries() {
   std::vector<LogEntry> entries;
+  // last_applied 只向前推进，保证每条已提交日志最多应用一次。
   while (last_applied_ < commit_index_) {
     ++last_applied_;
     entries.push_back(log_[last_applied_ - 1]);

@@ -15,6 +15,7 @@ namespace rstone {
 
 class DistributedRegionNode {
  public:
+  // 分布式 Store 的本地 Peer。每个进程只持有自己的 Peer，通过 RPC 复制给其他 Store。
   Status Bootstrap(const std::string& data_dir, const StoreInfo& local_store,
                    const std::vector<StoreInfo>& stores, const RegionInfo& region);
 
@@ -22,8 +23,10 @@ class DistributedRegionNode {
   Status Delete(const std::string& key);
   Status Batch(const std::vector<KvMutation>& mutations);
   Status Get(const std::string& key, Consistency consistency, std::string* value) const;
+  // 手动迁移 Leader：目标 Store 收到请求后发起一轮 RequestVote。
   Status TransferLeader(PeerId target_peer_id);
 
+  // 以下两个方法是 Store 间 Raft RPC 的本地处理入口。
   RequestVoteResponse HandleRequestVote(const RequestVoteRequest& request);
   AppendEntriesResponse HandleAppendEntries(const AppendEntriesRequest& request);
 
@@ -36,6 +39,7 @@ class DistributedRegionNode {
   Status EnsureLeader();
   Status ProposeAndReplicate(const std::string& command);
   Status BroadcastCommit(LogIndex commit_index);
+  // 将日志后缀复制到指定 Store；失败时根据 follower 的 match_index 回退重试。
   Status ReplicateToStore(const StoreInfo& store, LogIndex first_index,
                           LogIndex leader_commit, bool* replicated);
   Status PersistHardState();
