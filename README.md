@@ -7,6 +7,7 @@ RStone 是一个计划实现的基于 Raft 的分布式 KV 存储项目。当前
 - [RStone 项目学习文档](docs/STUDY_GUIDE.md)
 - [RStone 代码阅读教学文档](docs/CODE_READING_GUIDE.md)
 - [Web Dashboard 实现文档](docs/WEB_DASHBOARD_IMPLEMENTATION.md)
+- [后续优化与扩展路线](docs/FUTURE_OPTIMIZATION_ROADMAP.md)
 - [简历项目描述](docs/RESUME_DESCRIPTION.md)
 
 核心目标：
