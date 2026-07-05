@@ -29,6 +29,7 @@ c++ -std=c++17 -Wall -Wextra -Wpedantic -Iinclude \
   src/store/single_region_cluster.cpp \
   src/store/multi_region_cluster.cpp \
   src/store/distributed_region_node.cpp \
+  src/store/distributed_store_node.cpp \
   src/store/store_service.cpp \
   src/main.cpp \
   -o build/rstone-server
@@ -59,6 +60,7 @@ c++ -std=c++17 -Wall -Wextra -Wpedantic -Iinclude \
   src/store/single_region_cluster.cpp \
   src/store/multi_region_cluster.cpp \
   src/store/distributed_region_node.cpp \
+  src/store/distributed_store_node.cpp \
   src/store/store_service.cpp \
   tools/rstone_cli.cpp \
   -o build/rstone-cli
@@ -89,6 +91,7 @@ c++ -std=c++17 -Wall -Wextra -Wpedantic -Iinclude \
   src/store/single_region_cluster.cpp \
   src/store/multi_region_cluster.cpp \
   src/store/distributed_region_node.cpp \
+  src/store/distributed_store_node.cpp \
   src/store/store_service.cpp \
   tests/unit/test_main.cpp \
   tests/unit/status_test.cpp \

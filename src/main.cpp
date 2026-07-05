@@ -18,6 +18,7 @@
 #include "rstone/rpc/rpc_codec.h"
 #include "rstone/rpc/tcp_rpc.h"
 #include "rstone/store/distributed_region_node.h"
+#include "rstone/store/distributed_store_node.h"
 #include "rstone/store/single_region_cluster.h"
 #include "rstone/store/multi_region_cluster.h"
 #include "rstone/store/store_service.h"
@@ -263,10 +264,10 @@ int RunDistributedStoreService(const rstone::Config& config) {
     return 1;
   }
 
-  auto node = std::make_unique<rstone::DistributedRegionNode>();
+  auto node = std::make_unique<rstone::DistributedStoreNode>();
   // 使用 PD 中的 Region/Peer 元数据启动本地 Peer，并从本地数据目录恢复 Raft 状态。
   status = node->Bootstrap(config.GetStringOr("store.data_dir", "./data/store1"),
-                           local_store, stores, regions.front());
+                           local_store, stores, regions);
   if (!status.ok()) {
     RSTONE_LOG_ERROR(status.ToString());
     return 1;
@@ -397,7 +398,7 @@ int RunGatewayService(const rstone::Config& config) {
   }
 
   const auto host = config.GetStringOr("gateway.host", "127.0.0.1");
-  const int port = config.GetIntOr("gateway.http_port", 8081);
+  const int port = config.GetIntOr("gateway.http_port", 18080);
   rstone::TcpRpcServer tcp_server(rpc_server);
   status = tcp_server.Start(host, port);
   if (!status.ok()) {

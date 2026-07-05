@@ -34,6 +34,7 @@ add_library(rstone_core
   src/store/single_region_cluster.cpp
   src/store/multi_region_cluster.cpp
   src/store/distributed_region_node.cpp
+  src/store/distributed_store_node.cpp
   src/store/store_service.cpp
 )
 

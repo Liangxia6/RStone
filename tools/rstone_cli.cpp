@@ -25,7 +25,7 @@ rstone::Endpoint ParseEndpoint(const std::string& value) {
   rstone::Endpoint endpoint;
   const auto colon = value.find(':');
   endpoint.host = colon == std::string::npos ? value : value.substr(0, colon);
-  endpoint.port = colon == std::string::npos ? 8081 : std::stoi(value.substr(colon + 1));
+  endpoint.port = colon == std::string::npos ? 18080 : std::stoi(value.substr(colon + 1));
   return endpoint;
 }
 
@@ -43,7 +43,7 @@ rstone::RpcResponse Call(rstone::RpcClient* client, const std::string& method,
 }  // namespace
 
 int main(int argc, char** argv) {
-  std::string endpoint_arg = "127.0.0.1:8081";
+  std::string endpoint_arg = "127.0.0.1:18080";
   int index = 1;
   if (argc > 2 && std::string(argv[1]) == "--endpoint") {
     endpoint_arg = argv[2];

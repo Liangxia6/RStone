@@ -889,7 +889,7 @@ role: gateway
 gateway:
   id: gateway1
   host: 127.0.0.1
-  http_port: 8081
+  http_port: 18080
   route_cache_ttl_ms: 30000
 
 pd:
@@ -1280,7 +1280,7 @@ CONFIG_CHANGE_IN_PROGRESS
 
 ```text
 pd1       127.0.0.1:7000
-gateway1 127.0.0.1:8081
+gateway1 127.0.0.1:18080
 store1   raft 7101, client 8101
 store2   raft 7102, client 8102
 store3   raft 7103, client 8103
@@ -1299,9 +1299,9 @@ store3   raft 7103, client 8103
 CLI：
 
 ```bash
-./rstone-cli --endpoint 127.0.0.1:8081 put user:1 alice
-./rstone-cli --endpoint 127.0.0.1:8081 get user:1 --consistency linearizable
-./rstone-cli --endpoint 127.0.0.1:8081 get user:1 --consistency eventual
+./rstone-cli --endpoint 127.0.0.1:18080 put user:1 alice
+./rstone-cli --endpoint 127.0.0.1:18080 get user:1 --consistency linearizable
+./rstone-cli --endpoint 127.0.0.1:18080 get user:1 --consistency eventual
 ```
 
 ## 19. 里程碑验收表

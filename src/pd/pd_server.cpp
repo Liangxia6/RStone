@@ -20,6 +20,7 @@ Status PdServer::Open(const std::string& data_dir) {
 }
 
 Status PdServer::RegisterStore(StoreInfo* store) {
+  std::lock_guard<std::mutex> lock(mutex_);
   if (store == nullptr) {
     return Status::InvalidArgument("store must not be null");
   }
@@ -38,6 +39,7 @@ Status PdServer::RegisterStore(StoreInfo* store) {
 }
 
 Status PdServer::StoreHeartbeat(StoreId store_id, std::int64_t now_ms) {
+  std::lock_guard<std::mutex> lock(mutex_);
   auto store = metadata_.GetStore(store_id);
   if (!store) {
     return {ErrorCode::kStoreNotFound, "store not found"};
@@ -52,6 +54,7 @@ Status PdServer::StoreHeartbeat(StoreId store_id, std::int64_t now_ms) {
 }
 
 Status PdServer::BootstrapDefaultRegion(const std::vector<StoreId>& store_ids) {
+  std::lock_guard<std::mutex> lock(mutex_);
   if (!metadata_.ListRegions().empty()) {
     return Status::Ok();
   }
@@ -85,6 +88,7 @@ Status PdServer::BootstrapDefaultRegion(const std::vector<StoreId>& store_ids) {
 
 Status PdServer::SplitRegion(RegionId region_id, const std::string& split_key,
                              RegionInfo* left, RegionInfo* right) {
+  std::lock_guard<std::mutex> lock(mutex_);
   auto region = metadata_.GetRegion(region_id);
   if (!region) {
     return {ErrorCode::kRegionNotFound, "region not found"};
@@ -137,6 +141,7 @@ Status PdServer::SplitRegion(RegionId region_id, const std::string& split_key,
 }
 
 Status PdServer::AddPeer(RegionId region_id, StoreId store_id, Peer* added_peer) {
+  std::lock_guard<std::mutex> lock(mutex_);
   auto region = metadata_.GetRegion(region_id);
   if (!region) {
     return {ErrorCode::kRegionNotFound, "region not found"};
@@ -169,6 +174,7 @@ Status PdServer::AddPeer(RegionId region_id, StoreId store_id, Peer* added_peer)
 }
 
 Status PdServer::RemovePeer(RegionId region_id, PeerId peer_id) {
+  std::lock_guard<std::mutex> lock(mutex_);
   auto region = metadata_.GetRegion(region_id);
   if (!region) {
     return {ErrorCode::kRegionNotFound, "region not found"};
@@ -197,6 +203,7 @@ Status PdServer::RemovePeer(RegionId region_id, PeerId peer_id) {
 }
 
 Status PdServer::TransferLeader(RegionId region_id, PeerId target_peer_id) {
+  std::lock_guard<std::mutex> lock(mutex_);
   auto region = metadata_.GetRegion(region_id);
   if (!region) {
     return {ErrorCode::kRegionNotFound, "region not found"};
@@ -213,20 +220,33 @@ Status PdServer::TransferLeader(RegionId region_id, PeerId target_peer_id) {
 }
 
 std::optional<RegionInfo> PdServer::GetRegionByKey(const std::string& key) const {
+  std::lock_guard<std::mutex> lock(mutex_);
   return metadata_.GetRegionByKey(key);
 }
 
 std::optional<StoreInfo> PdServer::GetStore(StoreId store_id) const {
+  std::lock_guard<std::mutex> lock(mutex_);
   return metadata_.GetStore(store_id);
 }
 
 std::optional<StoreInfo> PdServer::GetRegionLeaderStore(const RegionInfo& region) const {
+  std::lock_guard<std::mutex> lock(mutex_);
   // Region 记录的是 leader_peer_id，需要先找到 Peer，再映射到 Store。
   const Peer* leader = FindPeer(region, region.leader_peer_id);
   if (leader == nullptr) {
     return std::nullopt;
   }
   return metadata_.GetStore(leader->store_id);
+}
+
+std::vector<StoreInfo> PdServer::ListStores() const {
+  std::lock_guard<std::mutex> lock(mutex_);
+  return metadata_.ListStores();
+}
+
+std::vector<RegionInfo> PdServer::ListRegions() const {
+  std::lock_guard<std::mutex> lock(mutex_);
+  return metadata_.ListRegions();
 }
 
 Status PdServer::Persist() const {

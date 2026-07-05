@@ -2,7 +2,7 @@ role: gateway
 gateway:
   id: gateway1
   host: 127.0.0.1
-  http_port: 8081
+  http_port: 18080
   route_cache_ttl_ms: 30000
 dashboard:
   enabled: true

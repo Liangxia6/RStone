@@ -5,7 +5,7 @@ ROOT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT_DIR"
 
 OPS="${1:-100}"
-ENDPOINT="${2:-127.0.0.1:8081}"
+ENDPOINT="${2:-127.0.0.1:18080}"
 
 cleanup() {
   scripts/stop_local_cluster.sh >/dev/null 2>&1 || true

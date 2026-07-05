@@ -5,7 +5,7 @@ set +m
 ROOT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT_DIR"
 
-ENDPOINT="${1:-127.0.0.1:8081}"
+ENDPOINT="${1:-127.0.0.1:18080}"
 HISTORY="build/consistency/history.tsv"
 
 cleanup() {

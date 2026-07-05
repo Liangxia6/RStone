@@ -1,5 +1,6 @@
 #pragma once
 
+#include <mutex>
 #include <optional>
 #include <string>
 #include <vector>
@@ -31,6 +32,8 @@ class PdServer {
   std::optional<RegionInfo> GetRegionByKey(const std::string& key) const;
   std::optional<StoreInfo> GetStore(StoreId store_id) const;
   std::optional<StoreInfo> GetRegionLeaderStore(const RegionInfo& region) const;
+  std::vector<StoreInfo> ListStores() const;
+  std::vector<RegionInfo> ListRegions() const;
 
  private:
   Status Persist() const;
@@ -39,6 +42,7 @@ class PdServer {
 
   PdMetadataStore metadata_;
   std::string data_dir_;
+  mutable std::mutex mutex_;
 };
 
 }  // namespace rstone

@@ -237,8 +237,8 @@ RpcResponse PdService::HandleGetStore(const RpcRequest& request) {
 
 RpcResponse PdService::HandleStatus(const RpcRequest& request) {
   FieldMap fields;
-  const auto stores = pd_->metadata().ListStores();
-  const auto regions = pd_->metadata().ListRegions();
+  const auto stores = pd_->ListStores();
+  const auto regions = pd_->ListRegions();
   fields["store_count"] = std::to_string(stores.size());
   fields["region_count"] = std::to_string(regions.size());
   for (std::size_t i = 0; i < stores.size(); ++i) {

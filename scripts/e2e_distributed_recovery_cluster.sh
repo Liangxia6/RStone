@@ -65,7 +65,7 @@ expect_gateway_value() {
   local key="$1"
   local expected="$2"
   local actual
-  actual="$(./build/rstone-cli --endpoint 127.0.0.1:8081 get "$key")"
+  actual="$(./build/rstone-cli --endpoint 127.0.0.1:18080 get "$key")"
   if [ "$actual" != "$expected" ]; then
     echo "unexpected gateway value for $key: expected=$expected actual=$actual" >&2
     exit 1
@@ -100,23 +100,23 @@ wait_for_log build/logs/store3.log "Store TCP service listening" "Store-3"
 start_bg gateway ./build/rstone-server --role gateway --config config/distributed_gateway.yaml --serve
 wait_for_log build/logs/gateway.log "Gateway TCP service listening" "Gateway"
 
-./build/rstone-cli --endpoint 127.0.0.1:8081 put recovery:base base >/dev/null
+./build/rstone-cli --endpoint 127.0.0.1:18080 put recovery:base base >/dev/null
 expect_gateway_value recovery:base base
 
 stop_component store3
-./build/rstone-cli --endpoint 127.0.0.1:8081 put recovery:while-store3-down missed-by-store3 >/dev/null
+./build/rstone-cli --endpoint 127.0.0.1:18080 put recovery:while-store3-down missed-by-store3 >/dev/null
 expect_gateway_value recovery:while-store3-down missed-by-store3
 start_store 3
-./build/rstone-cli --endpoint 127.0.0.1:8081 put recovery:catchup-store3 catchup >/dev/null
+./build/rstone-cli --endpoint 127.0.0.1:18080 put recovery:catchup-store3 catchup >/dev/null
 expect_store_value 127.0.0.1:8103 recovery:while-store3-down missed-by-store3
 expect_store_value 127.0.0.1:8103 recovery:catchup-store3 catchup
 
 stop_component store1
-./build/rstone-cli --endpoint 127.0.0.1:8081 transfer-leader 1 2 >/dev/null
-./build/rstone-cli --endpoint 127.0.0.1:8081 put recovery:leader-down written-by-peer2 >/dev/null
+./build/rstone-cli --endpoint 127.0.0.1:18080 transfer-leader 1 2 >/dev/null
+./build/rstone-cli --endpoint 127.0.0.1:18080 put recovery:leader-down written-by-peer2 >/dev/null
 expect_gateway_value recovery:leader-down written-by-peer2
 start_store 1
-./build/rstone-cli --endpoint 127.0.0.1:8081 put recovery:catchup-store1 catchup >/dev/null
+./build/rstone-cli --endpoint 127.0.0.1:18080 put recovery:catchup-store1 catchup >/dev/null
 expect_store_value 127.0.0.1:8101 recovery:leader-down written-by-peer2
 expect_store_value 127.0.0.1:8101 recovery:catchup-store1 catchup
 

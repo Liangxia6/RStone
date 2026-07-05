@@ -54,9 +54,9 @@ scripts/e2e_distributed_recovery_cluster.sh
 
 ```bash
 scripts/run_local_cluster.sh
-./build/rstone-cli --endpoint 127.0.0.1:8081 put user:1 alice
-./build/rstone-cli --endpoint 127.0.0.1:8081 get user:1
-./build/rstone-cli --endpoint 127.0.0.1:8081 status
+./build/rstone-cli --endpoint 127.0.0.1:18080 put user:1 alice
+./build/rstone-cli --endpoint 127.0.0.1:18080 get user:1
+./build/rstone-cli --endpoint 127.0.0.1:18080 status
 scripts/stop_local_cluster.sh
 ```
 
@@ -173,7 +173,7 @@ KV 写入不会直接修改 KV Engine，而是先编码成 command，写入 Raft
 以命令为例：
 
 ```bash
-./build/rstone-cli --endpoint 127.0.0.1:8081 put user:1 alice
+./build/rstone-cli --endpoint 127.0.0.1:18080 put user:1 alice
 ```
 
 完整流程：
@@ -195,7 +195,7 @@ KV 写入不会直接修改 KV Engine，而是先编码成 command，写入 Raft
 ## 6. 一次读请求的完整链路
 
 ```bash
-./build/rstone-cli --endpoint 127.0.0.1:8081 get user:1
+./build/rstone-cli --endpoint 127.0.0.1:18080 get user:1
 ```
 
 流程：
@@ -295,9 +295,9 @@ Store：
 
 ```bash
 scripts/run_local_cluster.sh
-./build/rstone-cli --endpoint 127.0.0.1:8081 put a 1
-./build/rstone-cli --endpoint 127.0.0.1:8081 get a
-./build/rstone-cli --endpoint 127.0.0.1:8081 status
+./build/rstone-cli --endpoint 127.0.0.1:18080 put a 1
+./build/rstone-cli --endpoint 127.0.0.1:18080 get a
+./build/rstone-cli --endpoint 127.0.0.1:18080 status
 scripts/stop_local_cluster.sh
 ```
 

@@ -109,7 +109,7 @@ PD + Store
 后续可以拆成独立进程：
 
 ```bash
-rstone-dashboard --gateway 127.0.0.1:8081 --listen 127.0.0.1:9090
+rstone-dashboard --gateway 127.0.0.1:18080 --listen 127.0.0.1:9090
 ```
 
 优点：
@@ -409,7 +409,7 @@ role: gateway
 gateway:
   id: gateway1
   host: 127.0.0.1
-  http_port: 8081
+  http_port: 18080
   store_routing: dynamic
 dashboard:
   enabled: true

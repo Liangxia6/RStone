@@ -2,6 +2,7 @@
 
 #include "rstone/rpc/rpc_server.h"
 #include "rstone/store/distributed_region_node.h"
+#include "rstone/store/distributed_store_node.h"
 #include "rstone/store/multi_region_cluster.h"
 #include "rstone/store/single_region_cluster.h"
 
@@ -12,6 +13,7 @@ class StoreService {
   explicit StoreService(SingleRegionCluster* cluster);
   explicit StoreService(MultiRegionCluster* cluster);
   explicit StoreService(DistributedRegionNode* node);
+  explicit StoreService(DistributedStoreNode* node);
 
   Status RegisterHandlers(RpcServer* server);
 
@@ -31,6 +33,7 @@ class StoreService {
   SingleRegionCluster* single_cluster_ = nullptr;
   MultiRegionCluster* multi_cluster_ = nullptr;
   DistributedRegionNode* distributed_node_ = nullptr;
+  DistributedStoreNode* distributed_store_ = nullptr;
 };
 
 }  // namespace rstone

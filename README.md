@@ -38,12 +38,12 @@ scripts/build_manual.sh
 
 ```bash
 scripts/run_local_cluster.sh
-./build/rstone-cli --endpoint 127.0.0.1:8081 put user:1 alice
-./build/rstone-cli --endpoint 127.0.0.1:8081 get user:1
-./build/rstone-cli --endpoint 127.0.0.1:8081 transfer-leader 1 2
-./build/rstone-cli --endpoint 127.0.0.1:8081 remove-peer 1 3
-./build/rstone-cli --endpoint 127.0.0.1:8081 split 1 m
-./build/rstone-cli --endpoint 127.0.0.1:8081 status
+./build/rstone-cli --endpoint 127.0.0.1:18080 put user:1 alice
+./build/rstone-cli --endpoint 127.0.0.1:18080 get user:1
+./build/rstone-cli --endpoint 127.0.0.1:18080 transfer-leader 1 2
+./build/rstone-cli --endpoint 127.0.0.1:18080 remove-peer 1 3
+./build/rstone-cli --endpoint 127.0.0.1:18080 split 1 m
+./build/rstone-cli --endpoint 127.0.0.1:18080 status
 scripts/stop_local_cluster.sh
 ```
 
@@ -93,7 +93,7 @@ Nginx TCP stream 入口配置示例：
 
 ```bash
 nginx -c /absolute/path/to/RStone/config/nginx.conf -p /absolute/path/to/RStone
-./build/rstone-cli --endpoint 127.0.0.1:18081 put user:1 alice
+./build/rstone-cli --endpoint 127.0.0.1:28081 put user:1 alice
 ```
 
 已实现的代码层：

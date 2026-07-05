@@ -53,8 +53,8 @@ wait_for_log build/logs/store3.log "Store TCP service listening" "Store-3"
 start_bg gateway ./build/rstone-server --role gateway --config config/distributed_gateway.yaml --serve
 wait_for_log build/logs/gateway.log "Gateway TCP service listening" "Gateway"
 
-./build/rstone-cli --endpoint 127.0.0.1:8081 put distributed:key v1 >/dev/null
-value="$(./build/rstone-cli --endpoint 127.0.0.1:8081 get distributed:key)"
+./build/rstone-cli --endpoint 127.0.0.1:18080 put distributed:key v1 >/dev/null
+value="$(./build/rstone-cli --endpoint 127.0.0.1:18080 get distributed:key)"
 if [ "$value" != "v1" ]; then
   echo "distributed get failed: $value" >&2
   exit 1
@@ -72,16 +72,16 @@ if [ "$(cat /tmp/rstone_dist_get3.out)" != "v1" ]; then
   exit 1
 fi
 
-./build/rstone-cli --endpoint 127.0.0.1:8081 put distributed:key v2 >/dev/null
-value="$(./build/rstone-cli --endpoint 127.0.0.1:8081 get distributed:key)"
+./build/rstone-cli --endpoint 127.0.0.1:18080 put distributed:key v2 >/dev/null
+value="$(./build/rstone-cli --endpoint 127.0.0.1:18080 get distributed:key)"
 if [ "$value" != "v2" ]; then
   echo "distributed overwrite failed: $value" >&2
   exit 1
 fi
 
-./build/rstone-cli --endpoint 127.0.0.1:8081 transfer-leader 1 2 >/dev/null
-./build/rstone-cli --endpoint 127.0.0.1:8081 put distributed:after-transfer peer2 >/dev/null
-value="$(./build/rstone-cli --endpoint 127.0.0.1:8081 get distributed:after-transfer)"
+./build/rstone-cli --endpoint 127.0.0.1:18080 transfer-leader 1 2 >/dev/null
+./build/rstone-cli --endpoint 127.0.0.1:18080 put distributed:after-transfer peer2 >/dev/null
+value="$(./build/rstone-cli --endpoint 127.0.0.1:18080 get distributed:after-transfer)"
 if [ "$value" != "peer2" ]; then
   echo "distributed transfer write failed: $value" >&2
   exit 1
@@ -94,7 +94,7 @@ if [ "$(cat /tmp/rstone_dist_get1_after_transfer.out)" != "peer2" ]; then
   exit 1
 fi
 
-status_output="$(./build/rstone-cli --endpoint 127.0.0.1:8081 status)"
+status_output="$(./build/rstone-cli --endpoint 127.0.0.1:18080 status)"
 echo "$status_output" | grep -q "pd.store_count=3"
 echo "$status_output" | grep -q "pd.region0.leader_peer_id=2"
 
