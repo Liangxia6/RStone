@@ -6,6 +6,7 @@ RStone 是一个计划实现的基于 Raft 的分布式 KV 存储项目。当前
 - [RStone 架构设计](docs/ARCHITECTURE.md)
 - [RStone 项目学习文档](docs/STUDY_GUIDE.md)
 - [RStone 代码阅读教学文档](docs/CODE_READING_GUIDE.md)
+- [Web Dashboard 实现文档](docs/WEB_DASHBOARD_IMPLEMENTATION.md)
 - [简历项目描述](docs/RESUME_DESCRIPTION.md)
 
 核心目标：
@@ -75,6 +76,12 @@ scripts/e2e_distributed_cluster.sh
 scripts/e2e_distributed_recovery_cluster.sh
 ```
 
+运行 Dashboard 端到端验证：
+
+```bash
+scripts/e2e_dashboard.sh
+```
+
 运行本地 benchmark：
 
 ```bash
@@ -115,5 +122,6 @@ nginx -c /absolute/path/to/RStone/config/nginx.conf -p /absolute/path/to/RStone
 - 分布式单 Region Raft 路径：每个 Store 进程承载一个本地 Peer，Leader 通过 TCP RPC 向其他 Store 发送 RequestVote/AppendEntries，多数派提交后应用状态机。
 - 分布式恢复验证：覆盖 follower 离线后补日志、leader 下线后手动迁移到其他 peer、旧 leader 重启后追平日志。
 - Gateway 动态 Store 路由：服务模式可按 PD 返回的 Region leader endpoint 访问目标 Store。
+- Web Dashboard：Gateway 可启动 `9090` HTTP 页面，实时展示 PD、Store、Region 和 Raft runtime 状态。
 - Nginx stream 配置示例：`config/nginx.conf`。
 - Benchmark 脚本：`scripts/benchmark.sh` 输出 put/get 耗时与吞吐。

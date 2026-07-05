@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>RStone Dashboard</title>
+    <link rel="stylesheet" href="/style.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div>
+        <h1>RStone Dashboard</h1>
+        <p id="subtitle">Cluster status</p>
+      </div>
+      <div class="actions">
+        <button id="refreshButton" type="button">Refresh</button>
+        <button id="pauseButton" type="button">Pause</button>
+      </div>
+    </header>
+
+    <main>
+      <section class="summary-grid" id="summary"></section>
+
+      <section class="layout">
+        <div class="panel">
+          <div class="panel-header">
+            <h2>Stores</h2>
+            <span id="storeCount" class="muted"></span>
+          </div>
+          <div id="stores" class="node-grid"></div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header">
+            <h2>Raft Runtime</h2>
+            <span id="runtimeCount" class="muted"></span>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Region</th>
+                  <th>Store</th>
+                  <th>Peer</th>
+                  <th>Role</th>
+                  <th>Commit</th>
+                  <th>Applied</th>
+                  <th>Last Log</th>
+                </tr>
+              </thead>
+              <tbody id="runtimeRows"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-header">
+          <h2>Regions</h2>
+          <span id="regionCount" class="muted"></span>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Range</th>
+                <th>Epoch</th>
+                <th>Leader</th>
+                <th>Peers</th>
+              </tr>
+            </thead>
+            <tbody id="regionRows"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="layout">
+        <div class="panel">
+          <div class="panel-header">
+            <h2>Warnings</h2>
+            <span id="warningCount" class="muted"></span>
+          </div>
+          <div id="warnings" class="stack"></div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header">
+            <h2>Raw Fields</h2>
+            <span class="muted">FieldMap</span>
+          </div>
+          <pre id="rawFields"></pre>
+        </div>
+      </section>
+    </main>
+
+    <script src="/app.js"></script>
+  </body>
+</html>

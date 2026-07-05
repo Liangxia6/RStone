@@ -8,6 +8,7 @@
 
 #include "rstone/common/serialization.h"
 #include "rstone/common/config.h"
+#include "rstone/dashboard/dashboard_server.h"
 #include "rstone/common/logging.h"
 #include "rstone/gateway/gateway_service.h"
 #include "rstone/gateway/gateway_server.h"
@@ -405,6 +406,20 @@ int RunGatewayService(const rstone::Config& config) {
   }
   RSTONE_LOG_INFO("Gateway TCP service listening on " + host + ":" +
                   std::to_string(tcp_server.bound_port()));
+
+  std::unique_ptr<rstone::DashboardServer> dashboard;
+  if (config.GetStringOr("dashboard.enabled", "false") == "true") {
+    const auto dashboard_host = config.GetStringOr("dashboard.host", "127.0.0.1");
+    const int dashboard_port = config.GetIntOr("dashboard.port", 9090);
+    dashboard = std::make_unique<rstone::DashboardServer>(gateway.get());
+    status = dashboard->Start(dashboard_host, dashboard_port);
+    if (!status.ok()) {
+      RSTONE_LOG_ERROR(status.ToString());
+      return 1;
+    }
+    RSTONE_LOG_INFO("Dashboard HTTP service listening on " + dashboard_host + ":" +
+                    std::to_string(dashboard->bound_port()));
+  }
   WaitForever();
   return 0;
 }

@@ -6,6 +6,8 @@ mkdir -p build
 c++ -std=c++17 -Wall -Wextra -Wpedantic -Iinclude \
   src/common/config.cpp \
   src/common/serialization.cpp \
+  src/dashboard/dashboard_server.cpp \
+  src/dashboard/status_json.cpp \
   src/storage/file_kv_engine.cpp \
   src/storage/kv_command.cpp \
   src/pd/metadata_store.cpp \
@@ -34,6 +36,8 @@ c++ -std=c++17 -Wall -Wextra -Wpedantic -Iinclude \
 c++ -std=c++17 -Wall -Wextra -Wpedantic -Iinclude \
   src/common/config.cpp \
   src/common/serialization.cpp \
+  src/dashboard/dashboard_server.cpp \
+  src/dashboard/status_json.cpp \
   src/storage/file_kv_engine.cpp \
   src/storage/kv_command.cpp \
   src/pd/metadata_store.cpp \
@@ -62,6 +66,8 @@ c++ -std=c++17 -Wall -Wextra -Wpedantic -Iinclude \
 c++ -std=c++17 -Wall -Wextra -Wpedantic -Iinclude \
   src/common/config.cpp \
   src/common/serialization.cpp \
+  src/dashboard/dashboard_server.cpp \
+  src/dashboard/status_json.cpp \
   src/storage/file_kv_engine.cpp \
   src/storage/kv_command.cpp \
   src/pd/metadata_store.cpp \
@@ -88,6 +94,7 @@ c++ -std=c++17 -Wall -Wextra -Wpedantic -Iinclude \
   tests/unit/status_test.cpp \
   tests/unit/config_test.cpp \
   tests/unit/serialization_test.cpp \
+  tests/unit/status_json_test.cpp \
   tests/unit/file_kv_engine_test.cpp \
   tests/unit/pd_metadata_store_test.cpp \
   tests/unit/pd_server_test.cpp \

@@ -5,6 +5,10 @@ gateway:
   http_port: 8081
   route_cache_ttl_ms: 30000
   store_routing: dynamic
+dashboard:
+  enabled: true
+  host: 127.0.0.1
+  port: 9090
 pd:
   endpoints: 127.0.0.1:7000
 store:
